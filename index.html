@@ -1,100 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="google-site-verification" content="s08qBMsdUFInYi6XMsArIkHghMUzm2wIvQzEfmbh6_U" />
- <meta name="description" content="Free exam score predictor for students. Estimate your board exam percentage using study habits, revision level and mock test performance.">
- 
- <title>Board Exam Percentage Predictor</title>
- <meta name="description" content="Predict your board exam percentage using study habits, mock tests and preparation level. Free exam score predictor tool for students.">
 
-<meta name="keywords" content="exam score predictor, board exam percentage predictor, student exam prediction tool, study predictor">
+<!-- Google Search Console verification -->
+<meta name="google-site-verification" content="s08qBMsdUFInYi6XMsArIkHghMUzm2wIvQzEfmbh6_U" />
+
+<!-- SEO -->
+<title>Board Exam Score Predictor | Predict Your Exam Percentage</title>
+
+<meta name="description" content="Free board exam score predictor for students. Estimate your exam percentage using study habits, revision level and mock test performance.">
+
+<meta name="keywords" content="exam score predictor, board exam percentage predictor, exam preparation calculator, student exam predictor">
 
 <meta name="author" content="Abhigyan">
+<meta name="robots" content="index,follow">
 
-<meta property="og:title" content="Exam Score Predictor">
-<meta property="og:description" content="Predict your exam percentage instantly using AI-style prediction.">
+<!-- Social preview -->
+<meta property="og:title" content="Board Exam Score Predictor">
+<meta property="og:description" content="Predict your exam percentage instantly based on your preparation.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://abhigyan1528.github.io/exam-score-predictor/">
+
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
+
 body{
 margin:0;
-font-family:Poppins, sans-serif;
+font-family:Poppins,sans-serif;
 background:linear-gradient(135deg,#050814,#0a1d3b);
-color:white;
-min-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-overflow:hidden
+color:white
 }
 
-.container{
-width:92%;
-max-width:850px;
-padding:35px;
-border-radius:20px;
-background:rgba(255,255,255,0.08);
-backdrop-filter:blur(20px);
-box-shadow:0 0 40px rgba(0,0,0,.6);
+nav{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px 30px;
+background:rgba(0,0,0,.4);
+backdrop-filter:blur(10px);
+position:sticky;
+top:0
+}
+
+nav h2{margin:0;font-weight:800}
+
+nav a{
+color:white;
+text-decoration:none;
+margin-left:20px;
+font-weight:600;
+opacity:.8
+}
+
+nav a:hover{opacity:1}
+
+.section{
+padding:70px 20px;
+max-width:900px;
+margin:auto;
 text-align:center
 }
 
-h1{
-font-size:42px;
+.hero h1{
+font-size:48px;
 margin-bottom:10px;
 background:linear-gradient(90deg,#40a9ff,#00ffd5);
 -webkit-background-clip:text;
 -webkit-text-fill-color:transparent
 }
 
-.subtitle{opacity:.8;margin-bottom:20px}
+.start-btn{
+padding:16px 30px;
+background:#00ffd5;
+border:none;
+border-radius:12px;
+font-weight:700;
+margin-top:25px;
+cursor:pointer
+}
 
-.progress-wrap{margin:20px 0}
+.quiz-card{
+background:rgba(255,255,255,.08);
+padding:30px;
+border-radius:20px;
+backdrop-filter:blur(20px);
+margin-top:30px
+}
 
 .progress-bar{
-width:100%;
-height:14px;
+height:12px;
 background:#111;
 border-radius:10px;
-overflow:hidden
+overflow:hidden;
+margin-bottom:20px
 }
 
 .progress-fill{
 height:100%;
 width:0;
 background:linear-gradient(90deg,#00ff9d,#00c3ff);
-transition:width .6s ease
+transition:width .5s
 }
 
-.question{
-font-size:26px;
-margin:20px 0;
-font-weight:600;
-opacity:0;
-transform:translateY(20px);
-transition:.5s ease
-}
+.question{font-size:24px;margin-bottom:20px}
 
 .options{
 display:grid;
 grid-template-columns:1fr 1fr;
-gap:15px;
-opacity:0;
-transform:translateY(20px);
-transition:.5s ease
+gap:12px
 }
 
 .option{
-padding:16px;
-background:rgba(255,255,255,.07);
-border-radius:14px;
+padding:14px;
+background:rgba(255,255,255,.08);
+border-radius:12px;
 cursor:pointer;
-transition:.25s;
-font-weight:600
+transition:.25s
 }
 
 .option:hover{
@@ -102,55 +130,78 @@ background:rgba(255,255,255,.2);
 transform:scale(1.05)
 }
 
-.option.selected{
-background:#00ffd5;
-color:#001;
-transform:scale(1.05)
-}
-
 .result{display:none}
 
 .big-score{
 font-size:70px;
-font-weight:800;
-margin:10px 0
+font-weight:800
 }
 
 .badge{
-padding:10px 18px;
+margin:15px 0;
+padding:10px 20px;
+background:linear-gradient(90deg,#00eaff,#4aff9c);
+color:#001;
 border-radius:30px;
 font-weight:700;
-display:inline-block;
-margin:10px 0;
-background:linear-gradient(90deg,#00eaff,#4aff9c);
-color:#001
+display:inline-block
 }
 
-.confidence{margin-top:10px;font-size:18px;opacity:.9}
+.buttons{
+margin-top:20px
+}
 
-canvas{max-width:420px;margin:20px auto}
-
-.share-btn{
-padding:14px 25px;
+.buttons button{
+padding:12px 18px;
 border:none;
 border-radius:10px;
-background:#00ffd5;
-font-weight:700;
-cursor:pointer
+margin:6px;
+cursor:pointer;
+font-weight:600
 }
+
+.download{background:#00ffd5}
+.challenge{background:#407bff;color:white}
+.restart{background:#222;color:white}
+
+footer{
+text-align:center;
+padding:25px;
+opacity:.6
+}
+
 </style>
+
 </head>
 
 <body>
 
-<div class="container">
+<nav>
+<h2>ExamScore</h2>
+<div>
+<a href="#home">Home</a>
+<a href="#predictor">Predictor</a>
+<a href="#about">About</a>
+<a href="#contact">Contact</a>
+</div>
+</nav>
 
-<h1>Board Exam Predictor</h1>
-<div class="subtitle">Interactive performance prediction</div>
+<section id="home" class="section hero">
+<h1>Board Exam Score Predictor</h1>
+<p>Predict your exam percentage based on study habits and preparation.</p>
+<button class="start-btn" onclick="document.getElementById('predictor').scrollIntoView({behavior:'smooth'})">
+Try Predictor
+</button>
+</section>
 
-<div class="progress-wrap">
-<div id="step"></div>
-<div class="progress-bar"><div id="progress" class="progress-fill"></div></div>
+<section id="predictor" class="section">
+
+<h2>Predict Your Board Exam Percentage</h2>
+
+<div class="quiz-card" id="quizCard">
+
+<div class="progress-bar">
+<div class="progress-fill" id="progress"></div>
 </div>
 
 <div id="quiz">
@@ -159,15 +210,52 @@ cursor:pointer
 </div>
 
 <div class="result" id="result">
-<div class="big-score" id="score">0%</div>
+
+<div class="big-score" id="score"></div>
+
 <div class="badge" id="badge"></div>
-<div class="confidence" id="confidence"></div>
-<canvas id="radar"></canvas>
-<p id="explain"></p>
-<button class="share-btn" onclick="shareResult()">Share Result</button>
+
+<canvas id="radar" style="max-width:350px;margin:auto"></canvas>
+
+<div class="buttons">
+
+<button class="download" onclick="downloadCard()">Download Result Card</button>
+
+<button class="challenge" onclick="challengeFriend()">Challenge Friend</button>
+
+<button class="restart" onclick="location.reload()">Try Again</button>
+
 </div>
 
 </div>
+
+</div>
+
+</section>
+
+<section id="about" class="section">
+
+<h2>About This Tool</h2>
+
+<p>
+This free board exam score predictor helps students estimate their expected percentage based on study habits, revision level, consistency and mock test performance. Students preparing for CBSE, ICSE and state board exams can use this exam preparation calculator to predict their possible exam results.
+</p>
+
+</section>
+
+<section id="contact" class="section">
+
+<h2>Contact</h2>
+
+<p>Suggestions or feedback are welcome.</p>
+
+<p>Email: example@email.com</p>
+
+</section>
+
+<footer>
+Built by Abhigyan | Student Developer
+</footer>
 
 <script>
 
@@ -179,12 +267,7 @@ const questions=[
 {q:"Sleep hours?",o:["<5","5-6","6-8","8+"],v:[3,6,9,10]},
 {q:"Daily phone distraction?",o:[">5h","3-5h","1-3h","<1h"],v:[2,5,8,10]},
 {q:"Study consistency per week?",o:["1-2 days","3-4","5-6","Daily"],v:[3,6,9,12]},
-{q:"Last exam percentage?",o:["<60","60-75","75-85","85+"],v:[3,6,9,12]},
-{q:"Practice questions per day?",o:["<10","10-30","30-60","60+"],v:[3,6,9,12]},
-{q:"Weak chapters remaining?",o:["Many","Some","Few","Almost none"],v:[2,5,8,11]},
-{q:"Past year papers solved?",o:["0","1-3","4-7","8+"],v:[3,6,9,12]},
-{q:"Focus level while studying?",o:["Distracted","Average","Focused","Deep focus"],v:[3,6,9,12]},
-{q:"Guidance level?",o:["None","School","Coaching","Coaching + self"],v:[3,6,9,11]}
+{q:"Last exam percentage?",o:["<60","60-75","75-85","85+"],v:[3,6,9,12]}
 ]
 
 let index=0
@@ -192,78 +275,74 @@ let score=0
 
 const qEl=document.getElementById("question")
 const oEl=document.getElementById("options")
-const progress=document.getElementById("progress")
-const step=document.getElementById("step")
-
-function showAnim(){
-qEl.style.opacity=1
-qEl.style.transform="translateY(0)"
-oEl.style.opacity=1
-oEl.style.transform="translateY(0)"
-}
-
-function hideAnim(){
-qEl.style.opacity=0
-qEl.style.transform="translateY(20px)"
-oEl.style.opacity=0
-oEl.style.transform="translateY(20px)"
-}
 
 function loadQuestion(){
+
 const q=questions[index]
+
 qEl.innerText=q.q
-step.innerText="Question "+(index+1)+" / "+questions.length
 
-progress.style.width=((index)/questions.length*100)+"%"
+const progress=(index/questions.length)*100
 
-setTimeout(()=>showAnim(),50)
+document.getElementById("progress").style.width=progress+"%"
 
 oEl.innerHTML=""
 
 q.o.forEach((opt,i)=>{
+
 const div=document.createElement("div")
+
 div.className="option"
+
 div.innerText=opt
 
-div.onclick=()=>{
-
-const options=document.querySelectorAll('.option')
-options.forEach(o=>o.classList.remove('selected'))
-
-div.classList.add('selected')
-
-setTimeout(()=>select(q.v[i]),350)
-
-}
+div.onclick=()=>select(q.v[i])
 
 oEl.appendChild(div)
+
 })
+
 }
 
 function select(val){
-hideAnim()
 
-setTimeout(()=>{
 score+=val
+
 index++
 
 if(index<questions.length){
+
 loadQuestion()
+
 }else{
+
 finish()
+
 }
 
-},450)
 }
 
 function finish(){
 
 document.getElementById("quiz").style.display="none"
+
 document.getElementById("result").style.display="block"
 
-let percent=Math.min(98,Math.round(score*0.7))
+const percent=Math.min(98,Math.round(score*1.2))
 
-animateScore(percent)
+const el=document.getElementById("score")
+
+let n=0
+
+const interval=setInterval(()=>{
+
+n++
+
+el.innerText=n+"%"
+
+if(n>=percent) clearInterval(interval)
+
+},20)
 
 let badge=""
 
@@ -272,93 +351,67 @@ else if(percent>80) badge="⚡ Consistent Learner"
 else if(percent>70) badge="📚 Improving Scholar"
 else badge="🚀 Last Minute Warrior"
 
-let confidence=Math.min(95,Math.round(score*0.6))
-
-
 document.getElementById("badge").innerText=badge
-
-document.getElementById("confidence").innerText="Prediction Confidence: "+confidence+"%"
-
-
-document.getElementById("explain").innerText="Prediction based on discipline, preparation depth, revision strength, focus quality, sleep balance, and exam practice indicators."
 
 createRadar(percent)
 
-if(percent>=90) confetti()
-
-}
-
-function animateScore(target){
-let n=0
-const el=document.getElementById("score")
-const i=setInterval(()=>{
-
-n++
-
-el.innerText=n+"%"
-
-if(n>=target) clearInterval(i)
-
-},20)
 }
 
 function createRadar(p){
+
 new Chart(document.getElementById("radar"),{
+
 type:'radar',
 
 data:{
 labels:['Discipline','Preparation','Revision','Focus'],
 datasets:[{data:[p-5,p,p-3,p-7]}]
 }
-})
-}
-
-function shareResult(){
-if(navigator.share){
-navigator.share({
-
- title:'Exam Predictor',
-
- text:'Check your predicted board exam score!',
-
- url:location.href
 
 })
-}
-}
-
-function confetti(){
-for(let i=0;i<120;i++){
-
-let c=document.createElement('div')
-
-c.style.position='fixed'
-
-c.style.width='6px'
-
-c.style.height='6px'
-
-c.style.background='hsl('+Math.random()*360+',100%,50%)'
-
-c.style.left=Math.random()*100+'vw'
-
-c.style.top='-10px'
-
-c.style.opacity='1'
-
-c.style.transition='3s linear'
-
-document.body.appendChild(c)
-
-setTimeout(()=>{
-
-c.style.top='100vh'
-
-c.style.opacity='0'
-
-},10)
 
 }
+
+function downloadCard(){
+
+const canvas=document.createElement("canvas")
+
+canvas.width=800
+canvas.height=400
+
+const ctx=canvas.getContext("2d")
+
+ctx.fillStyle="#0a1d3b"
+ctx.fillRect(0,0,800,400)
+
+ctx.fillStyle="white"
+ctx.font="bold 40px Poppins"
+ctx.fillText("Exam Score Prediction",160,120)
+
+ctx.font="bold 70px Poppins"
+ctx.fillText(document.getElementById("score").innerText,320,220)
+
+ctx.font="28px Poppins"
+ctx.fillText(document.getElementById("badge").innerText,260,300)
+
+const link=document.createElement("a")
+
+link.download="exam-score.png"
+
+link.href=canvas.toDataURL()
+
+link.click()
+
+}
+
+function challengeFriend(){
+
+const text=`I got ${document.getElementById("score").innerText} predicted score. Can you beat it? Try here: ${window.location.href}`
+
+navigator.clipboard.writeText(text)
+
+alert("Challenge copied! Send it to your friends.")
+
 }
 
 loadQuestion()
