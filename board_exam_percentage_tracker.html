@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Board Exam Percentage Predictor</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body{
+margin:0;
+font-family:Poppins, sans-serif;
+background:linear-gradient(135deg,#050814,#0a1d3b);
+color:white;
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+overflow:hidden
+}
+
+.container{
+width:92%;
+max-width:850px;
+padding:35px;
+border-radius:20px;
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(20px);
+box-shadow:0 0 40px rgba(0,0,0,.6);
+text-align:center
+}
+
+h1{
+font-size:42px;
+margin-bottom:10px;
+background:linear-gradient(90deg,#40a9ff,#00ffd5);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent
+}
+
+.subtitle{opacity:.8;margin-bottom:20px}
+
+.progress-wrap{margin:20px 0}
+
+.progress-bar{
+width:100%;
+height:14px;
+background:#111;
+border-radius:10px;
+overflow:hidden
+}
+
+.progress-fill{
+height:100%;
+width:0;
+background:linear-gradient(90deg,#00ff9d,#00c3ff);
+transition:width .6s ease
+}
+
+.question{
+font-size:26px;
+margin:20px 0;
+font-weight:600;
+opacity:0;
+transform:translateY(20px);
+transition:.5s ease
+}
+
+.options{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:15px;
+opacity:0;
+transform:translateY(20px);
+transition:.5s ease
+}
+
+.option{
+padding:16px;
+background:rgba(255,255,255,.07);
+border-radius:14px;
+cursor:pointer;
+transition:.25s;
+font-weight:600
+}
+
+.option:hover{
+background:rgba(255,255,255,.2);
+transform:scale(1.05)
+}
+
+.option.selected{
+background:#00ffd5;
+color:#001;
+transform:scale(1.05)
+}
+
+.result{display:none}
+
+.big-score{
+font-size:70px;
+font-weight:800;
+margin:10px 0
+}
+
+.badge{
+padding:10px 18px;
+border-radius:30px;
+font-weight:700;
+display:inline-block;
+margin:10px 0;
+background:linear-gradient(90deg,#00eaff,#4aff9c);
+color:#001
+}
+
+.confidence{margin-top:10px;font-size:18px;opacity:.9}
+
+canvas{max-width:420px;margin:20px auto}
+
+.share-btn{
+padding:14px 25px;
+border:none;
+border-radius:10px;
+background:#00ffd5;
+font-weight:700;
+cursor:pointer
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Board Exam Predictor</h1>
+<div class="subtitle">Interactive performance prediction</div>
+
+<div class="progress-wrap">
+<div id="step"></div>
+<div class="progress-bar"><div id="progress" class="progress-fill"></div></div>
+</div>
+
+<div id="quiz">
+<div class="question" id="question"></div>
+<div class="options" id="options"></div>
+</div>
+
+<div class="result" id="result">
+<div class="big-score" id="score">0%</div>
+<div class="badge" id="badge"></div>
+<div class="confidence" id="confidence"></div>
+<canvas id="radar"></canvas>
+<p id="explain"></p>
+<button class="share-btn" onclick="shareResult()">Share Result</button>
+</div>
+
+</div>
+
+<script>
+
+const questions=[
+{q:"Daily study hours?",o:["<1","1-3","3-5","5+"],v:[2,5,8,10]},
+{q:"Revisions completed?",o:["0","1","2","3+"],v:[2,5,8,10]},
+{q:"Mock test average %?",o:["<50","50-70","70-85","85+"],v:[3,6,9,12]},
+{q:"Syllabus completion?",o:["<40%","40-60%","60-80%","80%+"],v:[3,6,9,12]},
+{q:"Sleep hours?",o:["<5","5-6","6-8","8+"],v:[3,6,9,10]},
+{q:"Daily phone distraction?",o:[">5h","3-5h","1-3h","<1h"],v:[2,5,8,10]},
+{q:"Study consistency per week?",o:["1-2 days","3-4","5-6","Daily"],v:[3,6,9,12]},
+{q:"Last exam percentage?",o:["<60","60-75","75-85","85+"],v:[3,6,9,12]},
+{q:"Practice questions per day?",o:["<10","10-30","30-60","60+"],v:[3,6,9,12]},
+{q:"Weak chapters remaining?",o:["Many","Some","Few","Almost none"],v:[2,5,8,11]},
+{q:"Past year papers solved?",o:["0","1-3","4-7","8+"],v:[3,6,9,12]},
+{q:"Focus level while studying?",o:["Distracted","Average","Focused","Deep focus"],v:[3,6,9,12]},
+{q:"Guidance level?",o:["None","School","Coaching","Coaching + self"],v:[3,6,9,11]}
+]
+
+let index=0
+let score=0
+
+const qEl=document.getElementById("question")
+const oEl=document.getElementById("options")
+const progress=document.getElementById("progress")
+const step=document.getElementById("step")
+
+function showAnim(){
+qEl.style.opacity=1
+qEl.style.transform="translateY(0)"
+oEl.style.opacity=1
+oEl.style.transform="translateY(0)"
+}
+
+function hideAnim(){
+qEl.style.opacity=0
+qEl.style.transform="translateY(20px)"
+oEl.style.opacity=0
+oEl.style.transform="translateY(20px)"
+}
+
+function loadQuestion(){
+const q=questions[index]
+qEl.innerText=q.q
+step.innerText="Question "+(index+1)+" / "+questions.length
+
+progress.style.width=((index)/questions.length*100)+"%"
+
+setTimeout(()=>showAnim(),50)
+
+oEl.innerHTML=""
+
+q.o.forEach((opt,i)=>{
+const div=document.createElement("div")
+div.className="option"
+div.innerText=opt
+
+div.onclick=()=>{
+
+const options=document.querySelectorAll('.option')
+options.forEach(o=>o.classList.remove('selected'))
+
+div.classList.add('selected')
+
+setTimeout(()=>select(q.v[i]),350)
+
+}
+
+oEl.appendChild(div)
+})
+}
+
+function select(val){
+hideAnim()
+
+setTimeout(()=>{
+score+=val
+index++
+
+if(index<questions.length){
+loadQuestion()
+}else{
+finish()
+}
+
+},450)
+}
+
+function finish(){
+
+document.getElementById("quiz").style.display="none"
+document.getElementById("result").style.display="block"
+
+let percent=Math.min(98,Math.round(score*0.7))
+
+animateScore(percent)
+
+let badge=""
+
+if(percent>90) badge="🔥 Topper Mode"
+else if(percent>80) badge="⚡ Consistent Learner"
+else if(percent>70) badge="📚 Improving Scholar"
+else badge="🚀 Last Minute Warrior"
+
+let confidence=Math.min(95,Math.round(score*0.6))
+
+
+document.getElementById("badge").innerText=badge
+
+document.getElementById("confidence").innerText="Prediction Confidence: "+confidence+"%"
+
+
+document.getElementById("explain").innerText="Prediction based on discipline, preparation depth, revision strength, focus quality, sleep balance, and exam practice indicators."
+
+createRadar(percent)
+
+if(percent>=90) confetti()
+
+}
+
+function animateScore(target){
+let n=0
+const el=document.getElementById("score")
+const i=setInterval(()=>{
+
+n++
+
+el.innerText=n+"%"
+
+if(n>=target) clearInterval(i)
+
+},20)
+}
+
+function createRadar(p){
+new Chart(document.getElementById("radar"),{
+type:'radar',
+
+data:{
+labels:['Discipline','Preparation','Revision','Focus'],
+datasets:[{data:[p-5,p,p-3,p-7]}]
+}
+})
+}
+
+function shareResult(){
+if(navigator.share){
+navigator.share({
+
+ title:'Exam Predictor',
+
+ text:'Check your predicted board exam score!',
+
+ url:location.href
+
+})
+}
+}
+
+function confetti(){
+for(let i=0;i<120;i++){
+
+let c=document.createElement('div')
+
+c.style.position='fixed'
+
+c.style.width='6px'
+
+c.style.height='6px'
+
+c.style.background='hsl('+Math.random()*360+',100%,50%)'
+
+c.style.left=Math.random()*100+'vw'
+
+c.style.top='-10px'
+
+c.style.opacity='1'
+
+c.style.transition='3s linear'
+
+document.body.appendChild(c)
+
+setTimeout(()=>{
+
+c.style.top='100vh'
+
+c.style.opacity='0'
+
+},10)
+
+}
+}
+
+loadQuestion()
+
+</script>
+
+</body>
+</html>
